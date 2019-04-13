@@ -4,47 +4,93 @@
 #include <vector>
 #include <array>
 
-#include "model.hpp"
+#include <model.hpp>
 
-// constexpr float box[] = {
-//    1,1,1, -1,1,1, -1,1,-1, 1,1,-1,
-//    1,-1,1, -1,-1,1, -1,-1,-1, 1,-1,-1
-// };
+constexpr vertex cube[] = {
+  // Top
+  {{-1,1,1},    {1.0f,1.0f,1.0f,1.0f},  {0.0f, 0.0f}},
+  {{1,1,1},     {0.0f,1.0f,1.0f,1.0f},  {1.0f, 0.0f}},
+  {{1,1,-1},    {0.0f,1.0f,1.0f,1.0f},  {1.0f, 1.0f}},
+  {{-1,1,-1},   {0.0f,1.0f,1.0f,1.0f},  {0.0f, 1.0f}},
+  // Bottom
+  {{1,-1,1},    {0.0f,1.0f,1.0f,1.0f},  {0.0f, 0.0f}},
+  {{1,-1,-1},   {0.0f,1.0f,1.0f,1.0f},  {1.0f, 0.0f}},
+  {{-1,-1,-1},  {1.0f,1.0f,1.0f,1.0f},  {1.0f, 1.0f}},
+  {{-1,-1,1},   {0.0f,1.0f,1.0f,1.0f},  {0.0f, 1.0f}},
+  // Front
+  {{-1,-1,1},   {1.0f,1.0f,1.0f,1.0f},  {0.0f, 0.0f}},
+  {{1,-1,1},    {0.0f,1.0f,1.0f,1.0f},  {1.0f, 0.0f}},
+  {{1,1,1},     {0.0f,1.0f,1.0f,1.0f},  {1.0f, 1.0f}},
+  {{-1,1,1},    {0.0f,1.0f,1.0f,1.0f},  {0.0f, 1.0f}},
+  // Back
+  {{1,-1,-1},   {1.0f,1.0f,1.0f,1.0f},  {0.0f, 0.0f}},
+  {{-1,-1,-1},  {0.0f,1.0f,1.0f,1.0f},  {1.0f, 0.0f}},
+  {{-1,1,-1},   {0.0f,1.0f,1.0f,1.0f},  {1.0f, 1.0f}},
+  {{1,1,-1},    {0.0f,1.0f,1.0f,1.0f},  {0.0f, 1.0f}},
+  // Right
+  {{1,-1,1},    {1.0f,1.0f,1.0f,1.0f},  {0.0f, 0.0f}},
+  {{1,-1,-1},   {0.0f,1.0f,1.0f,1.0f},  {1.0f, 0.0f}},
+  {{1,1,-1},    {0.0f,1.0f,1.0f,1.0f},  {1.0f, 1.0f}},
+  {{1,1,1},     {0.0f,1.0f,1.0f,1.0f},  {0.0f, 1.0f}},
+  // Left
+  {{-1,-1,-1},  {1.0f,1.0f,1.0f,1.0f},  {0.0f, 0.0f}},
+  {{-1,-1,1},   {0.0f,1.0f,1.0f,1.0f},  {1.0f, 0.0f}},
+  {{-1,1,1},    {0.0f,1.0f,1.0f,1.0f},  {1.0f, 1.0f}},
+  {{-1,1,-1},   {0.0f,1.0f,1.0f,1.0f},  {0.0f, 1.0f}},
+};
 
-// constexpr GLuint boxIndex[] = {
-// 			   0,4,5, 4,1,0,
-// 			   0,1,3, 3,1,2,
-// 			   4,7,5, 7,6,5,
-// 			   1,5,6, 1,6,2,
-// 			   3,7,4, 3,4,0,
-// 			   2,6,7, 2,7,3	   
-// };
+constexpr GLuint cubeIndex[] = {
+  // Top 0-3
+  0,1,2, 2,3,0,
+  // Bottom 4-7
+  4,5,6, 6,7,4,
+  // Front 8-11
+  8,9,10, 10,11,8,
+  // Back 12-15
+  12,13,14, 14,15,12,
+  // Right 16-19
+  16,17,18, 18,19,16,
+  // Left 20-23
+  20,21,22, 22,23,20
+};
 
 /*
-.......(1,1,-1,)...3
-. top  .
-.. . ..(1,1,1)...0
+3.......(1,1,-1,)...2
+ . top .
+0.......(1,1,1)...1
 
-.......(1,-1,-1)...7
-. bot .
-.. ....(1,-1,1)...4
+6.......(1,-1,-1)...5
+ . bot .
+7.......(1,-1,1)...4
 */
 
-static constexpr vertex square[] = {
-  {{-0.5f,-0.5f,0.0f}, {0.8f,0.0f,0.0f,1.0f}, {0.0f, 0.0f}},
-  {{-0.5f,0.5f,0.0f},  {0.8f,0.0f,0.0f,1.0f}, {0.0f, 1.0f}},
-  {{0.5f,0.5f,0.0f},   {0.8f,0.0f,0.0f,1.0f}, {1.0f, 1.0f}},
-  {{0.5f,-0.5f,0.0f},  {0.8f,0.0f,0.0f,1.0f}, {1.0f, 0.0f}}
+
+// static constexpr vertex square[] = {// for dubug of the front surface
+//   {{-0.5f,-0.5f,0.0f}, {1.0f,1.0f,1.0f,1.0f}, {0.0f, 0.0f}},
+//   {{0.5f,-0.5f,0.0f},  {1.0f,1.0f,1.0f,1.0f}, {1.0f, 0.0f}},
+//   {{0.5f,0.5f,0.0f},   {1.0f,1.0f,1.0f,1.0f}, {1.0f, 1.0f}},
+//   {{-0.5f,0.5f,0.0f},  {1.0f,1.0f,1.0f,1.0f}, {0.0f, 1.0f}}
+// };
+static constexpr vertex square[] = {// for dubug of the right surface
+  {{1,-1,1},    {1.0f,1.0f,1.0f,1.0f},  {0.0f, 0.0f}},
+  {{1,-1,-1},   {1.0f,1.0f,0.0f,1.0f},  {1.0f, 0.0f}},
+  {{1,1,-1},    {0.0f,1.0f,1.0f,1.0f},  {1.0f, 1.0f}},
+  {{1,1,1},     {0.0f,1.0f,1.0f,1.0f},  {0.0f, 1.0f}},
 };
+// static constexpr vertex square[] = {// for dubug of the left surface
+//   {{-1,-1,-1},  {1.0f,1.0f,1.0f,1.0f},  {0.0f, 0.0f}},
+//   {{-1,-1,1},   {0.0f,1.0f,1.0f,1.0f},  {1.0f, 0.0f}},
+//   {{-1,1,1},    {0.0f,1.0f,1.0f,1.0f},  {1.0f, 1.0f}},
+//   {{-1,1,-1},   {0.0f,1.0f,1.0f,1.0f},  {0.0f, 1.0f}},
+// };
+
 static constexpr GLuint squareIndex[] = {
-  0,1,2,
-  0,2,3
+  0,1,2, 2,3,0
 };
 
-// sum up it to class
 constexpr std::array<vertex, 361> makeCircle()
 {
-  std::array<vertex, 361> circ{};// initializing by zero
+  std::array<vertex, 361> circ{};// initialization by zero
   circ[0] = {{0.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 1.0f, 1.0f}};
   for (int i=0;i<360;++i) {
     GLfloat theta = i * M_PI / 180;
@@ -52,11 +98,10 @@ constexpr std::array<vertex, 361> makeCircle()
   }
   return circ;
 }
-
 constexpr std::array<GLuint, 360*3> makeCircleIndex()
 {
   // 0,1,2,  0,2,3, 0,i,i+1 1<=i<360
-  std::array<GLuint, 360*3> circIndex{};// initializing by zero
+  std::array<GLuint, 360*3> circIndex{};// initialization by zero
   for (int i=1;i<360;++i) {
     for (int j=0;j<2;++j) {
       circIndex.data()[3*(i-1)+1+j] = i+j;
@@ -66,12 +111,10 @@ constexpr std::array<GLuint, 360*3> makeCircleIndex()
   circIndex[359*3+2] = 1;
   return circIndex;
 }
-
 const std::array<vertex,361> circle = makeCircle();
 const std::array<GLuint,360*3> circleIndex = makeCircleIndex();
 
 //----member----
-// want to do pattern machhing with function template
 Model::Model(modelType type)
 {
   switch (type)
@@ -90,6 +133,14 @@ Model::Model(modelType type)
       _elements = circleIndex.data();
       vcount = circle.size();
       ecount = circleIndex.size();
+      break;
+
+    case CUBE:
+      id = CUBE;
+      _vertices = cube;
+      _elements = cubeIndex;
+      vcount = sizeof(cube) / sizeof(cube[0]);
+      ecount = sizeof(cubeIndex) / sizeof(cubeIndex[0]);
       break;
 
     default:

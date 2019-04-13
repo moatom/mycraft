@@ -3,15 +3,16 @@
 
 #include <GL/glew.h>
 #include <vector>
+#include <SOIL.h>
+#include <iostream>
 
-#include "model.hpp"
-
+#include <model.hpp>
 
 constexpr float color[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-constexpr float pixels[] = {
-    0.0f, 0.0f, 0.0f,   1.0f, 1.0f, 1.0f,
-    1.0f, 1.0f, 1.0f,   0.0f, 0.0f, 0.0f
-};
+// constexpr float pixels[] = {
+//     0.0f, 0.0f, 0.0f,   1.0f, 1.0f, 1.0f,
+//     1.0f, 1.0f, 1.0f,   0.0f, 0.0f, 0.0f
+// };
 
 class Object {
   private:
@@ -37,16 +38,24 @@ class Object {
 
       // tex configuration
       glGenTextures(1, &tex);
+      // glActiveTexture(GL_TEXTURE0);
       glBindTexture(GL_TEXTURE_2D, tex);
+
+      int width, height;
+      unsigned char *image = SOIL_load_image("sample.png", &width, &height, 0, SOIL_LOAD_RGB);
+      if (image == 0) {
+        std::cerr << "image fault" << std::endl;
+        std::cerr << SOIL_last_result() << std::endl;
+      }
+      glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
+      SOIL_free_image_data(image);
+
+      glGenerateMipmap(GL_TEXTURE_2D);// call it before using texParams because those depend on it
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
       glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, color);
-      glGenerateMipmap(GL_TEXTURE_2D);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-
-      // tex loading
-      glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 2, 2, 0, GL_RGB, GL_FLOAT, pixels);
     }
 
     ~Object()

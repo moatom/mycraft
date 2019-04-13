@@ -14,7 +14,7 @@ typedef struct vertex {
   GLfloat texcoord[2];
 } vertex;
 
-enum modelType {SQUARE, CIRCLE};
+enum modelType {SQUARE, CIRCLE, CUBE};
 
 class Model {
   
