@@ -42,7 +42,7 @@ class Object {
       glBindTexture(GL_TEXTURE_2D, tex);
 
       int width, height;
-      unsigned char *image = SOIL_load_image("sample.png", &width, &height, 0, SOIL_LOAD_RGB);
+      unsigned char *image = SOIL_load_image("resource/side.png", &width, &height, 0, SOIL_LOAD_RGB);
       if (image == 0) {
         std::cerr << "image fault" << std::endl;
         std::cerr << SOIL_last_result() << std::endl;

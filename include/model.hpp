@@ -3,10 +3,6 @@
 
 #include <GL/glew.h>
 
-// template<typename t>
-// struct array {
-
-// };
 
 typedef struct vertex {
   GLfloat position[3];

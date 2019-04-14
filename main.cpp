@@ -7,6 +7,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <chrono>
+#include <array>
 
 #include <object.hpp>
 
@@ -15,6 +16,7 @@ const GLchar *vertexSource = R"glsl(
 in vec3 position;
 in vec4 color;
 in vec2 texcoord;
+in vec3 offset;
 
 out vec4 Color;
 out vec2 Texcoord;
@@ -25,8 +27,10 @@ uniform mat4 proj;
 
 void main()
 {
-  gl_Position = proj * view * model * vec4(position, 1.0);
-  // gl_Position = vec4(position, 1.0);
+  // vec3 tPosition = position + offset;
+  gl_Position = proj * view * (model * vec4(position, 1.0) + vec4(offset,0.0f));
+  // gl_Position = proj * view * model * vec4(position, 1.0);
+  // gl_Position = model*vec4(tPosition, 1.0);
   Color = color;
   Texcoord = vec2(texcoord.x, 1.0 - texcoord.y);
 })glsl";
@@ -44,6 +48,21 @@ void main()
 {
   outColor = texture(tex, Texcoord) * Color;
 })glsl";
+
+template<int n>
+constexpr auto makeOffsets()
+{
+  std::array<glm::vec3 , n*n> offsets{};
+  for (int i=0; i<n; ++i) {
+    for (int j=0; j<n; ++j) {
+      offsets[n*i+j].x = j/5.0f;
+      offsets[n*i+j].y = 0.0f;
+      offsets[n*i+j].z = i/5.0f;
+    }
+  }
+  return offsets;
+}
+const auto offsets = makeOffsets<20>();// will make sure how this works
 
 int main(int argc, char *argv[])
 {
@@ -113,11 +132,20 @@ int main(int argc, char *argv[])
   glEnableVertexAttribArray(texAttrib);
   glVertexAttribPointer(texAttrib, 2, GL_FLOAT, GL_FALSE, sizeof(vertex), reinterpret_cast<void*> (offsetof(vertex, texcoord)));
 
+  GLuint insVBO;
+  glGenBuffers(1, &insVBO);
+  glBindBuffer(GL_ARRAY_BUFFER, insVBO);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * offsets.size(), offsets.data(), GL_STATIC_DRAW);
+  GLint offsAttrib = glGetAttribLocation(shaderProgram, "offset");
+  glEnableVertexAttribArray(offsAttrib);
+  glVertexAttribPointer(offsAttrib, 3, GL_FLOAT, GL_FALSE, 3*sizeof(GLfloat), reinterpret_cast<void*> (0));
+  glVertexAttribDivisor(offsAttrib, 1);
+
   GLint uniTrans = glGetUniformLocation(shaderProgram, "model");
   auto t_start = std::chrono::high_resolution_clock::now();
 
   glm::mat4 view = glm::lookAt(
-    glm::vec3(0.0f, 2.0f, 2.0f),
+    glm::vec3(7.0f, 2.0f, 7.0f),
     glm::vec3(0.0f, 0.0f, 0.0f),
     glm::vec3(0.0f, 1.0f, 0.0f)
   );
@@ -134,17 +162,19 @@ int main(int argc, char *argv[])
     glm::mat4 model = glm::mat4(1.0f);
     auto t_now = std::chrono::high_resolution_clock::now();
     float time = std::chrono::duration_cast<std::chrono::duration<float>>(t_now - t_start).count();
-    model = glm::rotate(model, time * glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-    model *= glm::scale(glm::mat4(1.0f) ,glm::vec3(0.3f)) * model;
-
+    model = glm::scale(model ,glm::vec3(0.1f));
+    // model = glm::rotate(model, time * glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    // translate here!
     glUniformMatrix4fv(uniTrans, 1, GL_FALSE, glm::value_ptr(model));// reflect the changes of the view matrix
 
-    glDrawElements(GL_TRIANGLES, object._model.ecount , GL_UNSIGNED_INT, 0);
+    glDrawElementsInstanced(GL_TRIANGLES, object._model.ecount , GL_UNSIGNED_INT, 0, 20*20);
+    // glDrawElements(GL_TRIANGLES, object._model.ecount , GL_UNSIGNED_INT, 0);
 
     glfwSwapBuffers(window);
     glfwPollEvents();
   }
 
+  glDeleteBuffers(1, &insVBO);
   glDeleteProgram(shaderProgram);
   glDeleteShader(fragmentShader);
   glDeleteShader(vertexShader);
