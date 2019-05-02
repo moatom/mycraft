@@ -1,14 +1,35 @@
 #ifndef __UTIL_HPP__
 #define __UTIL_HPP__
 
-#include <array>
+#include <iostream>
+#include <glm/glm.hpp>
+#include <glm/gtx/string_cast.hpp>
 
-template<typename T, int n>
-void printArray(std::array<T, n> array)
+#define M_SIZE(type, member) sizeof(((type *)0)->member)
+
+void test(const char *a)
 {
-  for (auto e: array) {// assume that e is of primitive data type
-    std::cout << e << std::endl;
-  }
-};
+  std::cout << a << std::endl;
+}
+
+void v3Print(const char *title, glm::vec3 vec)
+{
+  std::cout << title << ": "
+            << vec.x << ", "
+            << vec.y << ", "
+            << vec.z << std::endl;
+}
+
+void m3Print(const char *title, glm::mat3 mat)
+{
+  std::cout << title << ":\n"
+            << glm::to_string(mat)
+            << std::endl;
+}
+
+void nPrint()
+{
+  std::cout << std::endl;
+}
 
 #endif

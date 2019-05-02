@@ -22,9 +22,9 @@ ENDIF(APPLE)
 include_directories(${GLEW_INCLUDE_DIRS} ${GLFW_INCLUDE_DIRS} ${OPENGL_INCLUDE_DIR} ${GLM_INCLUDE_DIRS} include)
 link_directories(lib)
 
-#file(GLOB_RECURSE SRC_FILES "*.cpp")
-#add_executable(mycraft ${SRC_FILES})
-add_executable(mycraft main.cpp model.cpp)
+file(GLOB_RECURSE SRC_FILES "./src/*.cpp")
+add_executable(mycraft ${SRC_FILES})
+# add_executable(mycraft main.cpp model.cpp shader.cpp camera.cpp)
 
 # target_link_libraries(mycraft ${GLEW_LIBRARIES} ${OPENGL_LIBRARIES} glfw ${GLM_LIBRARY_DIRS} m SOIL ${COCOA_LIBRARY})
 target_link_libraries(mycraft ${GLEW_LIBRARIES} ${OPENGL_LIBRARIES} glfw ${GLM_LIBRARY_DIRS} m SOIL ${CoreFoundation})
