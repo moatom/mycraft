@@ -10,7 +10,7 @@
 
 enum BlockType {
   GRASS=0, ROCK, BRICK
-};//==tex
+};
 
 typedef struct {
   std::vector<BlockObject> BlockList;
@@ -30,8 +30,6 @@ class BlockManager {
   BlockSet BlockSets[1];
 
   public:
-
-    ~BlockManager() {test("aaaa");};
     void addBlock(BlockType type, BlockObject block, glm::vec3 position)
     {
       BlockSet &bs = BlockSets[type];// シンボルのエイリアスは参照で受ける
@@ -44,6 +42,8 @@ class BlockManager {
         bs.needUpdate = true;
       }// deleteすると短くなるので、他のパラメータを調節しないとまずい
     }
+    // 当たり判定は、ブロックIDからブロックへ
+    // offsetの消去は、ブロックのポジションから
 
     BlockRef getBlockRef(BlockType type)
     {

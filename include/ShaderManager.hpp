@@ -12,6 +12,8 @@
 #include "block/BlockStruct.hpp"
 #include "util.hpp"
 
+#define DEFUALT_IBO_SIZE 10000
+
 constexpr GLchar *vertexSource = R"glsl(
 #version 150 core
 in vec3 position;
@@ -28,7 +30,6 @@ uniform mat4 proj;
 
 void main()
 {
-  // vec3 tPosition = position + offset;
   gl_Position = proj * view * (model * vec4(position, 1.0) + vec4(offset,0.0f));
   Color = color;
   Texcoord = vec2(texcoord.x, 1.0 - texcoord.y);
@@ -54,9 +55,11 @@ typedef struct {
   GLuint EBO;
   GLuint IBO;
   GLuint TEX;
+  int iboSize;
+  int iboCapa=DEFUALT_IBO_SIZE;
 } BOID;
 
-class ShaderManager {// このクラスではシェーダプログラムの中身に依存しない。ただ作られたプログラムをメモリに読み込むこと。
+class ShaderManager {
   private:
     GLuint ShaderProgram;
     GLuint vertexShader;
@@ -134,7 +137,7 @@ class ShaderManager {// このクラスではシェーダプログラムの中�
      
       glGenBuffers(1, &ibo);
       glBindBuffer(GL_ARRAY_BUFFER, ibo);
-      glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * 20*20, NULL, GL_STREAM_DRAW);//とりま大きめに
+      glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * DEFUALT_IBO_SIZE, NULL, GL_STREAM_DRAW);//とりま大きめに
       // glBindBuffer(GL_ARRAY_BUFFER, 0);
 
       glGenTextures(1, &tex);
@@ -179,12 +182,20 @@ class ShaderManager {// このクラスではシェーダプログラムの中�
 
     void attachObjects(GLuint vao, std::vector<glm::vec3> &offsets)
     {
-      glBindBuffer(GL_ARRAY_BUFFER, BOIDs[vao].IBO);
+      BOID &boid = BOIDs[vao];
+      boid.iboSize = offsets.size();
+      if (boid.iboCapa < boid.iboSize && boid.iboSize <= 2 * boid.iboCapa) {
+        boid.iboCapa *= 2;
+        glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * boid.iboCapa, NULL, GL_STREAM_DRAW);
+      } else if (2 * boid.iboCapa < boid.iboSize) {
+        boid.iboCapa = boid.iboSize;
+        glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * boid.iboCapa, NULL, GL_STREAM_DRAW);
+      }
+      glBindBuffer(GL_ARRAY_BUFFER, boid.IBO);
       // glBufferSubData(GL_ARRAY_BUFFER,
       //                 OffsetLists[i].lastModified,
       //                 sizeof(glm::vec3) * OffsetLists[i].vector.size()-i,
       //                 OffsetLists[i].vector.data()+i);
-      glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * 20*20, NULL, GL_STREAM_DRAW);//とりま大きめに
       glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(glm::vec3) * offsets.size(), offsets.data());
       // glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
@@ -196,7 +207,7 @@ class ShaderManager {// このクラスではシェーダプログラムの中�
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, BOIDs[vao].TEX);
         // インデックス数と、iboの数
-        glDrawElementsInstanced(GL_TRIANGLES, 6*6, GL_UNSIGNED_INT, 0, 20*20);
+        glDrawElementsInstanced(GL_TRIANGLES, 6*6, GL_UNSIGNED_INT, 0, BOIDs[vao].iboSize);
         glBindVertexArray(0);
     }
 };
