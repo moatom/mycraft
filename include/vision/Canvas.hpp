@@ -14,14 +14,16 @@ class Canvas {
   private:
     // glm::vec3 Position = glm::vec3(1.5f, 2*UNIT, 5.5f);
     glm::vec3 Position = glm::vec3(1.0f, 7*UNIT, 3.0f);
+    const glm::vec3 BlockBaseCanvasPosition = glm::vec3(0.f, 5*UNIT, 0.f);
     glm::vec3 Front    = glm::vec3(0.0f, 0.0f, -1.0f);
     glm::vec3 Up       = glm::vec3(0.0f, 1.0f,  0.0f);
 
     glm::vec3 Velocity = glm::vec3(0.0f, 0.0f,  0.0f);
-    float Radius   = UNIT * 0.8f;
-    // const float Acc = -9.8f;
     const float Acc = -1.0f;
     const float maxSpeed = 1.0f;
+
+    BlockObject Block;
+    glm::vec3 BlockPosition = Position - BlockBaseCanvasPosition;
     
     glm::mat4 Model;
     glm::mat4 View;
@@ -37,10 +39,11 @@ class Canvas {
     float fov   =  45.0f;
     const float sensitivity = 0.1f;
 
-    float Ratio;
+    const float Ratio;
 
   public:
-    Canvas(float ratio):Ratio(ratio) {}
+    Canvas(float ratio): Block(&BlockPosition), Ratio(ratio) {}
+
     void setModel(glm::mat4 model) {Model = model;}
     void setView() {View  = glm::lookAt(Position,Position + Front, Up);}
     void setProj() {Proj  = glm::perspective(glm::radians(fov), Ratio, 1.0f, 1000.0f);}
@@ -58,6 +61,8 @@ class Canvas {
     void mouseCallbackFunction(GLFWwindow *, double, double);
     void scrollCallbackFunction(GLFWwindow *, double, double);
 
+// calculateVelocity
+// if (!bm.cllision) setPosition
     void update(KeyManager km)
     {
       glm::vec3 velo(0.0f);
@@ -78,9 +83,11 @@ class Canvas {
         Velocity.y = -maxSpeed;
       }
 
+      if (collideWith())
+
+// setPosition
       Position += 2.5f * DeltaTime * Velocity;
-
-
+      BlockPosition = Position - BlockBaseCanvasPosition;
       //update -> detectCollision -> if so, restore // status構造体でlastStatusを管理する。
     }
 };

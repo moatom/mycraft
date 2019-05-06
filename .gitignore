@@ -1,4 +1,6 @@
-build
+build/*
+!resources
+
 debug
 .vscode
 sample.png

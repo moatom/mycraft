@@ -2,6 +2,8 @@
 #define __BLOCK_MANAGER_HPP__
 
 #include <vector>
+#include <array>
+#include <map>
 
 #include "BlockObject.hpp"
 #include "Model.hpp"
@@ -12,8 +14,16 @@ enum BlockType {
   GRASS=0, ROCK, BRICK
 };
 
+struct cmpVec3ByElements {
+  bool operator()(const glm::vec3& lhs, const glm::vec3& rhs) const
+  {
+      return lhs.x < rhs.x ||
+            (lhs.x == rhs.x && (lhs.y < rhs.y || (lhs.y == rhs.y && lhs.z < rhs.z)));
+  }
+};
+
 typedef struct {
-  std::vector<BlockObject> BlockList;
+  std::map<glm::vec3, BlockObject, cmpVec3ByElements> BlockList;
   std::vector<glm::vec3> OffsetList;
   Material material;
   bool needUpdate;
@@ -35,7 +45,7 @@ class BlockManager {
       BlockSet &bs = BlockSets[type];// シンボルのエイリアスは参照で受ける
       bs.OffsetList.push_back(position);
       block.setPosition(&bs.OffsetList.back());// 
-      bs.BlockList.push_back(block);
+      bs.BlockList.insert(std::make_pair(position,block));
 
       if (bs.needUpdate == false) {
         bs.lastModified = bs.OffsetList.size() - 1;
@@ -53,6 +63,46 @@ class BlockManager {
     std::vector<glm::vec3> &getBlockOffsetsRef(BlockType type)
     {
       return BlockSets[type].OffsetList;
+    }
+
+// raserの場合はbm側で変更を行うけど、aabbの場合、キャンバスの速さ０化と移動の可否(bool)を制御する必要がある。
+// 後者は前者にまとめられる。velocityを変えて渡せばいいのか。
+    bool collideWith(BlockObject& bo)
+    {// あっ、floorっていっても整数値じゃなくて、2*unit単位で制御しないと。　両方floorにかければ一対一対応するな　27マスとんないとだめ
+    // それか空間分割木で管理するか。まあPositionのインデックスは木中のIDに使えるし。
+    //ようは削除を同期させたいだけ。変更に関してはポジションの値しか変わらんからポインタからアクセスできる。
+    // 削除時はポジションのポインタ刺し直さないと
+    // というか、positionのアドレス値とoffsetListの開始値を比較すればインデックス計算できるな。。。
+    // とりまナイーブに実装する。
+      glm::vec3 center = (glm::floor(bo.getPosition() / (2.f*UNIT))) * (2.f*UNIT);
+
+      // 27個探して参照を詰めてやる関数 座標の差の大きさがイプシロン未満ならget!
+      // 二分探索木でいけるか？
+      std::array<glm::vec3, 27> target;
+      for (int i=0; i<3; ++i) {
+        for (int j=0; j<3; ++j) {
+          for (int k=0; k<3; ++k) {
+            target.at(3*3*i+3*j+k) = center + glm::vec3(i-1,j-1,k-1);
+          }
+        }  
+      }
+
+      // AABB
+      glm::vec3 aMin, aMax;
+      glm::vec3 bMin, bMax;
+      aMin = bo.getPosition() - bo.getSize()/2.f;
+      aMax = bo.getPosition() + bo.getSize()/2.f;
+      for (auto &bs: BlockSets) {
+        for (const auto &e: target) {
+          auto it = bs.BlockList.find(e);
+          if (it != bs.BlockList.end()) {
+            bMin = it->second.getPosition() - it->second.getSize()/2.f;
+            bMax = it->second.getPosition() + it->second.getSize()/2.f;
+            return (glm::all(glm::greaterThan(aMax, bMin)) && glm::all(glm::greaterThan(bMax, aMin)));
+          }
+        }
+      }
+      return false;
     }
 };
 #endif
