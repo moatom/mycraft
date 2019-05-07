@@ -4,7 +4,7 @@
 #include <glm/glm.hpp>
 
 typedef struct{
-  unsigned char *body;
+  unsigned char* body;
   int width, height;
 } Image;
 

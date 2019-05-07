@@ -1,6 +1,7 @@
 #ifndef __MATERIAL_HPP__
 #define __MATERIAL_HPP__
 
+#include <iostream>
 #include <GL/glew.h>
 
 #include "BlockStruct.hpp"

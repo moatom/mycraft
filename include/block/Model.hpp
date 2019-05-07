@@ -61,7 +61,7 @@ class Model {
     }}
     {}
 
-    std::array<Vertex, 4*6> &getCube() {return Cube;}
-    std::array<GLuint, 6*6> &getCubeIndex() {return CubeIndex;}
+    std::array<Vertex, 4*6>& getCube() {return Cube;}
+    std::array<GLuint, 6*6>& getCubeIndex() {return CubeIndex;}
 };
 #endif
