@@ -15,16 +15,27 @@ void BlockManager::addBlock(BlockType type, BlockObject block, glm::vec3 positio
 // 当たり判定は、ブロックIDからブロックへ
 // offsetの消去は、ブロックのポジションから
 
+constexpr std::array<glm::vec3, 6> DirectionVector{
+  glm::vec3( 0.f, 0.f,-1.f),
+  glm::vec3( 0.f, 0.f, 1.f),
+  glm::vec3( 0.f,-1.f, 0.f),
+  glm::vec3( 0.f, 1.f, 0.f),
+  glm::vec3(-1.f, 0.f, 0.f),
+  glm::vec3( 1.f, 0.f, 0.f)
+};
 
 // raserの場合はbm側で変更を行うけど、aabbの場合、キャンバスの速さ０化と移動の可否(bool)を制御する必要がある。
 // 後者は前者にまとめられる。velocityを変えて渡せばいいのか。
-bool BlockManager::collideWith(BlockObject& bo)
+std::tuple<bool, glm::vec3, glm::vec3> BlockManager::collideWith(BlockObject& block)
 {// あっ、floorっていっても整数値じゃなくて、2*unit単位で制御しないと。　両方floorにかければ一対一対応するな　27マスとんないとだめ
 // それか空間分割木で管理するか。まあPositionのインデックスは木中のIDに使えるし。
 //ようは削除を同期させたいだけ。変更に関してはポジションの値しか変わらんからポインタからアクセスできる。
 // 削除時はポジションのポインタ刺し直さないと
 // というか、positionのアドレス値とoffsetListの開始値を比較すればインデックス計算できるな。。。
-  glm::vec3 center = (glm::floor(bo.getPosition() / (2.f*UNIT))) * (2.f*UNIT);
+  glm::vec3 offset(0.f);
+  glm::vec3 fixV(1.f);
+  glm::vec3 center = (glm::floor(block.getPosition() / (2.f*UNIT))) * (2.f*UNIT);
+  bool collision = false;
 
   std::array<glm::vec3, 27> target;
   for (int i=0; i<3; ++i) {
@@ -35,24 +46,40 @@ bool BlockManager::collideWith(BlockObject& bo)
     }  
   }
 
-  test("--------");
   // AABB
+  test("--------");
   glm::vec3 aMin, aMax;
   glm::vec3 bMin, bMax;
-  aMin = bo.getPosition() - UNIT;
-  aMax = bo.getPosition() + UNIT;
-  // aMin = bo.getPosition() - bo.getSize()/2.f;
-  // aMax = bo.getPosition() + bo.getSize()/2.f;
+  aMin = block.getPosition() - UNIT;
+  aMax = block.getPosition() + UNIT;
 
   for (auto& bs: BlockSets) {
     for (const auto& t: target) {
       for (auto& bo: bs.BlockList) {
-        // find 床順からやった方が早いかと
-        if (glm::all(glm::lessThan(glm::abs(bo.first - t), glm::vec3(glm::epsilon<float>())))) {
-          // v3Print("", bo.first);
+        // find
+        if (glm::all(glm::lessThan(glm::abs(bo.first - t), glm::vec3(glm::epsilon<float>())))) {// 二分探索へ直す
           bMin = t - UNIT;
           bMax = t + UNIT;
-          if (glm::all(glm::greaterThan(aMax, bMin)) && glm::all(glm::greaterThan(bMax, aMin))) return true;
+          if (glm::all(glm::greaterThan(aMax, bMin)) && glm::all(glm::greaterThan(bMax, aMin))) {
+            float max(0.f);
+            int index=0;
+            glm::vec3 relativeV = t - block.getPosition();
+            for (int i=0; i<6; ++i) {
+              float t = glm::dot(relativeV, DirectionVector.at(i));
+              if (t>max) {
+                max = t;
+                index = i;
+              }
+            }
+
+            if (glm::dot(offset, DirectionVector.at(index)) == 0.f) {
+              collision = true;
+              offset += -(UNIT * DirectionVector.at(index) - (-UNIT * DirectionVector.at(index) + DirectionVector.at(index) * relativeV));
+            }
+            if (glm::abs<float>(glm::dot(fixV, DirectionVector.at(index))) >= glm::epsilon<float>()) {
+              fixV -= glm::abs(DirectionVector.at(index));// 最後に負だけ0にしても可。
+            }
+          }
         }
       }
 
@@ -66,5 +93,5 @@ bool BlockManager::collideWith(BlockObject& bo)
       // }
     }
   }
-  return false;
+  return std::tuple<bool, glm::vec3, glm::vec3>(collision, offset, fixV);
 }

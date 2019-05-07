@@ -6,6 +6,7 @@
 #include <map>
 #include <glm/glm.hpp>
 #include <glm/gtc/constants.hpp>
+#include <tuple>
 
 #include "BlockObject.hpp"
 #include "Model.hpp"
@@ -13,7 +14,9 @@
 #include "../util.hpp"
 
 enum BlockType {
-  GRASS=0, ROCK, BRICK
+  // CANVAS,
+  GRASS, ROCK, BRICK,
+  BLOCK_TYPE_SIZE
 };
 
 struct cmpVec3ByElements {
@@ -40,11 +43,11 @@ typedef struct {
 
 class BlockManager {
   Model model;
-  BlockSet BlockSets[1];
+  BlockSet BlockSets[BLOCK_TYPE_SIZE];
 
   public:
     void addBlock(BlockType, BlockObject, glm::vec3);
-    bool collideWith(BlockObject&);
+    std::tuple<bool, glm::vec3, glm::vec3> collideWith(BlockObject&);
 
     BlockRef getBlockRef(BlockType type)
     {

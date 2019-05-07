@@ -45,10 +45,6 @@ void Canvas::scrollCallbackFunction(GLFWwindow* window, double dx, double dy)
   if (fov >= 45.0f)                fov = 45.0f;
 }
 
-
-// calculateVelocity
-// if (!bm.cllision) setPosition
-// 今は衝突判定はできるが、レゾリューションがダメ、とりまbm引数で受けちゃうか？
 void Canvas::update(KeyManager km, BlockManager& bm, int mode)
 {
   glm::vec3 velo(0.0f);
@@ -72,12 +68,14 @@ void Canvas::update(KeyManager km, BlockManager& bm, int mode)
   }
   Velocity.z = velo.z;
 
-
-  // if (bm.collideWith())
-
 // setPosition
   BlockPosition += 2.5f * DeltaTime * Velocity;
   Position  = BlockBaseCanvasPosition + BlockPosition;
-  //update -> detectCollision -> if so, restore // status構造体でlastStatusを管理する。
-  if (bm.collideWith(Block)) test("heyhey\n");
+
+  auto modify = bm.collideWith(Block);
+  if (std::get<0>(modify)) {
+    Position += std::get<1>(modify);
+    Velocity *= std::get<2>(modify);
+  }
+
 }

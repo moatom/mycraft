@@ -44,15 +44,9 @@ int main()
   sm.setUniformM4f("view",  canvas.getViewPtr());
   sm.setUniformM4f("proj",  canvas.getProjPtr());
 
-  // sm.attachObjects(vao, bm.getBlockOffsetsRef(GRASS));// IBO
-  int cnt = 0;
   while (!glfwWindowShouldClose(window)) {
-    // if (cnt == 10) {
-    // }
-
     canvas.setTime(glfwGetTime());
     controller.keyInputsPoll(window);
-    canvas.update(controller.getKeyInputs(), bm, DEBUG_MODE);
 
     canvas.setView();
     canvas.setProj();
@@ -61,13 +55,13 @@ int main()
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     sm.render(vao);
+    canvas.update(controller.getKeyInputs(), bm, !DEBUG_MODE);
 
     glfwSwapBuffers(window);
     glfwPollEvents();
   }
 
   glfwTerminate();
-  ++cnt;
   return 0;  
 }
 

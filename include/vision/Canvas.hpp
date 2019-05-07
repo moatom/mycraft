@@ -16,7 +16,7 @@
 
 class Canvas {
   private:
-    BlockObject Block;// このブロックもbmに渡した方がいい。デバッグもしやすい。
+    BlockObject Block;// このブロックもbmに渡した方がいいか？動的なもの管理したくない
     // glm::vec3 BlockPosition = glm::vec3(1.0f, 2*UNIT, 3.0f);
     glm::vec3 BlockPosition = glm::vec3(2*UNIT, 2*UNIT, 2*UNIT);
 
@@ -29,7 +29,6 @@ class Canvas {
     glm::vec3 Velocity = glm::vec3(0.0f, 0.0f,  0.0f);
     const float Acc = -1.0f;
     const float MaxSpeed = 0.5f;
-
     
     glm::mat4 Model;
     glm::mat4 View;
@@ -62,6 +61,7 @@ class Canvas {
     auto getModelPtr() {return glm::value_ptr(Model);}
     auto getViewPtr() {return glm::value_ptr(View);}
     auto getProjPtr() {return glm::value_ptr(Proj);}
+    // auto getCharacter() {return }
 
     void setCallbackFunction(GLFWwindow* );
     void mouseCallbackFunction(GLFWwindow* , double, double);
