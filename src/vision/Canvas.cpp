@@ -48,7 +48,8 @@ void Canvas::scrollCallbackFunction(GLFWwindow* window, double dx, double dy)
 
 // calculateVelocity
 // if (!bm.cllision) setPosition
-void Canvas::update(KeyManager km)
+// 今は衝突判定はできるが、レゾリューションがダメ、とりまbm引数で受けちゃうか？
+void Canvas::update(KeyManager km, BlockManager& bm, int mode)
 {
   glm::vec3 velo(0.0f);
   velo += static_cast<float>(static_cast<int>(km.d) - static_cast<int>(km.a)) * glm::cross(Front, Up);
@@ -59,19 +60,24 @@ void Canvas::update(KeyManager km)
   }
 
   Velocity.x = velo.x;
-  Velocity.y += velo.y + Acc * DeltaTime;
-  Velocity.z = velo.z;
-  if (1) Velocity.y=0.0f;
-  if (Velocity.y > maxSpeed) {
-    Velocity.y = maxSpeed;
-  } else if (Velocity.y < -maxSpeed) {
-    Velocity.y = -maxSpeed;
+  if (mode) {
+    Velocity.y = velo.y;
+  } else {
+    Velocity.y += velo.y + Acc * DeltaTime;
+    if (Velocity.y > MaxSpeed) {
+      Velocity.y = MaxSpeed;
+    } else if (Velocity.y < -MaxSpeed) {
+      Velocity.y = -MaxSpeed;
+    }
   }
+  Velocity.z = velo.z;
 
-  // if (collideWith())
+
+  // if (bm.collideWith())
 
 // setPosition
-  Position += 2.5f * DeltaTime * Velocity;
-  BlockPosition = Position - BlockBaseCanvasPosition;
+  BlockPosition += 2.5f * DeltaTime * Velocity;
+  Position  = BlockBaseCanvasPosition + BlockPosition;
   //update -> detectCollision -> if so, restore // status構造体でlastStatusを管理する。
+  if (bm.collideWith(Block)) test("heyhey\n");
 }

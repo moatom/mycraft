@@ -4,11 +4,13 @@
 #include <vector>
 #include <array>
 #include <map>
+#include <glm/glm.hpp>
+#include <glm/gtc/constants.hpp>
 
 #include "BlockObject.hpp"
 #include "Model.hpp"
 #include "Material.hpp"
-// #include "../util.hpp"
+#include "../util.hpp"
 
 enum BlockType {
   GRASS=0, ROCK, BRICK
@@ -17,8 +19,9 @@ enum BlockType {
 struct cmpVec3ByElements {
   bool operator()(const glm::vec3& lhs, const glm::vec3& rhs) const
   {
-      return lhs.x < rhs.x ||
-            (lhs.x == rhs.x && (lhs.y < rhs.y || (lhs.y == rhs.y && lhs.z < rhs.z)));
+    // 排他的じゃないが。。。
+    return  lhs.x < rhs.x ||
+            (glm::abs<float>(lhs.x - rhs.x) < glm::epsilon<float>() && (lhs.y < rhs.y || (glm::abs<float>(lhs.y - rhs.y) < glm::epsilon<float>()  && lhs.z < rhs.z)));
   }
 };
 

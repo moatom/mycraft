@@ -24,33 +24,46 @@ bool BlockManager::collideWith(BlockObject& bo)
 //ようは削除を同期させたいだけ。変更に関してはポジションの値しか変わらんからポインタからアクセスできる。
 // 削除時はポジションのポインタ刺し直さないと
 // というか、positionのアドレス値とoffsetListの開始値を比較すればインデックス計算できるな。。。
-// とりまナイーブに実装する。
   glm::vec3 center = (glm::floor(bo.getPosition() / (2.f*UNIT))) * (2.f*UNIT);
 
-  // 27個探して参照を詰めてやる関数 座標の差の大きさがイプシロン未満ならget!
-  // 二分探索木でいけるか？
   std::array<glm::vec3, 27> target;
   for (int i=0; i<3; ++i) {
     for (int j=0; j<3; ++j) {
       for (int k=0; k<3; ++k) {
-        target.at(3*3*i+3*j+k) = center + glm::vec3(i-1,j-1,k-1);
+        target.at(3*3*i+3*j+k) = center + 2*UNIT*glm::vec3(i-1,j-1,k-1);
       }
     }  
   }
 
+  test("--------");
   // AABB
   glm::vec3 aMin, aMax;
   glm::vec3 bMin, bMax;
-  aMin = bo.getPosition() - bo.getSize()/2.f;
-  aMax = bo.getPosition() + bo.getSize()/2.f;
-  for (auto &bs: BlockSets) {
-    for (const auto &e: target) {
-      auto it = bs.BlockList.find(e);
-      if (it != bs.BlockList.end()) {
-        bMin = it->second.getPosition() - it->second.getSize()/2.f;
-        bMax = it->second.getPosition() + it->second.getSize()/2.f;
-        return (glm::all(glm::greaterThan(aMax, bMin)) && glm::all(glm::greaterThan(bMax, aMin)));
+  aMin = bo.getPosition() - UNIT;
+  aMax = bo.getPosition() + UNIT;
+  // aMin = bo.getPosition() - bo.getSize()/2.f;
+  // aMax = bo.getPosition() + bo.getSize()/2.f;
+
+  for (auto& bs: BlockSets) {
+    for (const auto& t: target) {
+      for (auto& bo: bs.BlockList) {
+        // find 床順からやった方が早いかと
+        if (glm::all(glm::lessThan(glm::abs(bo.first - t), glm::vec3(glm::epsilon<float>())))) {
+          // v3Print("", bo.first);
+          bMin = t - UNIT;
+          bMax = t + UNIT;
+          if (glm::all(glm::greaterThan(aMax, bMin)) && glm::all(glm::greaterThan(bMax, aMin))) return true;
+        }
       }
+
+      // auto it = bs.BlockList.find(t);// 今の定義だとx>y>zの優先度で比較関数を適用するからまずいかも?こっちでは全ての要素の大小関係で判別したい。
+      // if (it != bs.BlockList.end()) {
+      //   bMin = it->second.getPosition() - UNIT;
+      //   bMax = it->second.getPosition() + UNIT;
+      //   // bMin = it->second.getPosition() - it->second.getSize()/2.f;
+      //   // bMax = it->second.getPosition() + it->second.getSize()/2.f;
+      //   if (glm::all(glm::greaterThan(aMax, bMin)) && glm::all(glm::greaterThan(bMax, aMin))) return true;
+      // }
     }
   }
   return false;

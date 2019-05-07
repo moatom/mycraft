@@ -1,6 +1,7 @@
 #ifndef __CANVAS_HPP__
 #define __CANVAS_HPP__
 
+#include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
 #include <glm/glm.hpp>
@@ -8,24 +9,27 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/norm.hpp>
 
+#include "block/BlockManager.hpp"
 #include "block/BlockObject.hpp"
 #include "InputStruct.hpp"
-// #include "../util.hpp"
+#include "../util.hpp"
 
 class Canvas {
   private:
-    // glm::vec3 Position = glm::vec3(1.5f, 2*UNIT, 5.5f);
-    glm::vec3 Position = glm::vec3(1.0f, 7*UNIT, 3.0f);
-    const glm::vec3 BlockBaseCanvasPosition = glm::vec3(0.f, 5*UNIT, 0.f);
+    BlockObject Block;// このブロックもbmに渡した方がいい。デバッグもしやすい。
+    // glm::vec3 BlockPosition = glm::vec3(1.0f, 2*UNIT, 3.0f);
+    glm::vec3 BlockPosition = glm::vec3(2*UNIT, 2*UNIT, 2*UNIT);
+
+    // const glm::vec3 BlockBaseCanvasPosition = glm::vec3(0.f, 5*UNIT, 4*UNIT);
+    const glm::vec3 BlockBaseCanvasPosition = glm::vec3(0.f, 0.f, 0.f);
+    glm::vec3 Position = BlockBaseCanvasPosition + BlockPosition;
     glm::vec3 Front    = glm::vec3(0.0f, 0.0f, -1.0f);
     glm::vec3 Up       = glm::vec3(0.0f, 1.0f,  0.0f);
 
     glm::vec3 Velocity = glm::vec3(0.0f, 0.0f,  0.0f);
     const float Acc = -1.0f;
-    const float maxSpeed = 1.0f;
+    const float MaxSpeed = 0.5f;
 
-    BlockObject Block;
-    glm::vec3 BlockPosition = Position - BlockBaseCanvasPosition;
     
     glm::mat4 Model;
     glm::mat4 View;
@@ -63,6 +67,6 @@ class Canvas {
     void mouseCallbackFunction(GLFWwindow* , double, double);
     void scrollCallbackFunction(GLFWwindow* , double, double);
 
-    void update(KeyManager);
+    void update(KeyManager, BlockManager&, int);
 };
 #endif

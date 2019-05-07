@@ -7,6 +7,7 @@
 #include <vision/Canvas.hpp>
 #include <vision/GameController.hpp>
 // #include <util.hpp>
+#define DEBUG_MODE 1
 
 const int windowWidth = 1200;// 800"600
 const int windowHeight = 900;
@@ -51,7 +52,7 @@ int main()
 
     canvas.setTime(glfwGetTime());
     controller.keyInputsPoll(window);
-    canvas.update(controller.getKeyInputs());
+    canvas.update(controller.getKeyInputs(), bm, DEBUG_MODE);
 
     canvas.setView();
     canvas.setProj();
