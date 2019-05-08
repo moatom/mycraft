@@ -34,7 +34,9 @@ std::tuple<bool, glm::vec3, glm::vec3> BlockManager::collideWith(BlockObject& bl
   for (int i=0; i<3; ++i) {
     for (int j=0; j<3; ++j) {
       for (int k=0; k<3; ++k) {
-        target.at(3*3*i+3*j+k) = center + 2*UNIT*glm::vec3(i-1,j-1,k-1);
+        target.at(3*3*i+3*j+k) = center + 2*UNIT*glm::vec3(j-1,i-1,k-1);
+        // v3Print("", target.at(3*3*i+3*j+k));// 0,0,0は除いた方がいい希ガス？移動後の自身に対して下層とは上、周りとは前後左右、上層とは下の面とだけ当たり判定するべき
+        // ギリ中心がめり込んでない状態
       }
     }  
   }
@@ -43,15 +45,17 @@ std::tuple<bool, glm::vec3, glm::vec3> BlockManager::collideWith(BlockObject& bl
   aMin = block.getPosition() - UNIT;
   aMax = block.getPosition() + UNIT;
 
-  for (auto& bs: BlockSets) {
-    for (const auto& t: target) {
-      for (auto& bo: bs.BlockList) {
+  for (int i=0; i<BLOCK_TYPE_SIZE-1; ++i) {// characterは覗く
+    for (const auto& t: target) {// まずここで下層9個取り出したとして、どうやって限定させるか
+      for (const auto& bo: BlockSets[i].BlockList) {
         // find
         if (glm::all(glm::lessThan(glm::abs(bo.first - t), glm::vec3(glm::epsilon<float>())))) {// 二分探索へ直す
           bMin = t - UNIT;
           bMax = t + UNIT;
           if (glm::all(glm::greaterThan(aMax, bMin)) && glm::all(glm::greaterThan(bMax, aMin))) {
+            // 一回で9個とあたる　床内部の側面と当たっているのはまずいな　入り込んでからだから確かにありうる。
             test("-----------");
+            v3Print("targetPos", t);
             float max(0.f);
             int index=0;
             glm::vec3 relativeV = t - block.getPosition();
@@ -63,10 +67,10 @@ std::tuple<bool, glm::vec3, glm::vec3> BlockManager::collideWith(BlockObject& bl
               }
             }
 
-            if (glm::abs(glm::dot(offset, DirectionVector.at(index))) < glm::epsilon<float>()) {
-              collision = true;// 0.2よりだいぶ大きくもどっている？4倍でかいな
-              offset += -(UNIT * DirectionVector.at(index) - (-UNIT * DirectionVector.at(index) + DirectionVector.at(index) * relativeV))/4.f;
-              // v3Print("", offset);
+            if (glm::abs(glm::dot(offset, DirectionVector.at(index))) < glm::epsilon<float>()) {// うまくいってなさげ
+              collision = true;
+              glm::vec3 elementMask(glm::abs(DirectionVector.at(index)));
+              offset += -(UNIT * DirectionVector.at(index) - (-UNIT * DirectionVector.at(index) + elementMask * relativeV));
             }
             if (glm::abs(glm::dot(fixV, DirectionVector.at(index))) >= glm::epsilon<float>()) {
               fixV -= glm::abs(DirectionVector.at(index));// 最後に負だけ0にしても可。
@@ -74,14 +78,16 @@ std::tuple<bool, glm::vec3, glm::vec3> BlockManager::collideWith(BlockObject& bl
           }
         }
       }
-
-      // auto it = bs.BlockList.find(t);
-      // if (it != bs.BlockList.end()) {
-      //   bMin = it->second.getPosition() - UNIT;
-      //   bMax = it->second.getPosition() + UNIT;
-      //   if (glm::all(glm::greaterThan(aMax, bMin)) && glm::all(glm::greaterThan(bMax, aMin))) return true;
-      // }
     }
   }
+
+  //     // auto it = bs.BlockList.find(t);
+  //     // if (it != bs.BlockList.end()) {
+  //     //   bMin = it->second.getPosition() - UNIT;
+  //     //   bMax = it->second.getPosition() + UNIT;
+  //     //   if (glm::all(glm::greaterThan(aMax, bMin)) && glm::all(glm::greaterThan(bMax, aMin))) return true;
+  //     // }
+  //   }
+  // }
   return std::tuple<bool, glm::vec3, glm::vec3>(collision, offset, fixV);
 }

@@ -14,8 +14,8 @@
 #include "../util.hpp"
 
 enum BlockType {
-  CHARACTER,
   GRASS, ROCK, BRICK,
+  CHARACTER,
   BLOCK_TYPE_SIZE
 };
 

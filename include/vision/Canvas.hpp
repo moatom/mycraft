@@ -16,11 +16,12 @@
 
 class Canvas {
   private:
-    BlockObject& Block;// このブロックもbmに渡した方がいいか？動的なもの管理したくない
-    // glm::vec3 BlockPosition = glm::vec3(1.0f, 2*UNIT, 3.0f);
+    BlockObject& Block;
 
     // const glm::vec3 BlockBaseCanvasPosition = glm::vec3(0.f, 5*UNIT, 4*UNIT);
-    const glm::vec3 BlockBaseCanvasPosition = glm::vec3(0.f, 0.f, 1.f);
+    const glm::vec3 BlockBaseCanvasPosition = glm::vec3(0.f, 3*UNIT, 10*UNIT);
+    // const glm::vec3 BlockBaseCanvasPosition = glm::vec3(0.f, 0.f, 1.f);
+    // const glm::vec3 BlockBaseCanvasPosition = glm::vec3(1.f, 0.f, 0.f);
     glm::vec3 Position = BlockBaseCanvasPosition + Block.getPosition();
     glm::vec3 Front    = glm::vec3(0.0f, 0.0f, -1.0f);
     glm::vec3 Up       = glm::vec3(0.0f, 1.0f,  0.0f);
@@ -46,7 +47,7 @@ class Canvas {
     const float Ratio;
 
   public:
-    Canvas(float ratio, BlockObject& block): Block(block), Ratio(ratio) {}
+    Canvas(BlockObject& block, float ratio): Block(block), Ratio(ratio) {}
 
     void setModel(glm::mat4 model) {Model = model;}
     void setView() {View  = glm::lookAt(Position,Position + Front, Up);}

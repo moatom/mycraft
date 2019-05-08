@@ -38,10 +38,11 @@ int main()
 
   BlockRef br2 = bm.getBlockRef(CHARACTER);
   GLuint vao2 = sm.makeBOID(br2.model.getCube(), br2.model.getCubeIndex(), br2.material.getImage());// VBO, EBO, TEX
-  bm.addBlock(CHARACTER, BlockObject(), glm::vec3(6*UNIT, 2*UNIT, 6*UNIT));// IBO
+  // bm.addBlock(CHARACTER, BlockObject(), glm::vec3(8*UNIT, 2*UNIT, 8*UNIT));
+  bm.addBlock(CHARACTER, BlockObject(), glm::vec3(8*UNIT, 6*UNIT, 8*UNIT));
   sm.attachObjects(vao2, bm.getBlockOffsetsRef(CHARACTER));// IBO
 
-  Canvas canvas(windowWidth / windowHeight, bm.getCharacter());
+  Canvas canvas(bm.getCharacter(), windowWidth / windowHeight);
   canvas.setCallbackFunction(window);
   canvas.setModel(glm::scale(glm::mat4(1.0f), glm::vec3(UNIT)));
   canvas.setView();
@@ -61,7 +62,7 @@ int main()
     canvas.setProj();
     sm.setUniformM4f("view",  canvas.getViewPtr());
     sm.setUniformM4f("proj",  canvas.getProjPtr());
-    canvas.update(controller.getKeyInputs(), bm, DEBUG_MODE);
+    canvas.update(controller.getKeyInputs(), bm, !DEBUG_MODE);
     sm.attachObjects(vao2, bm.getBlockOffsetsRef(CHARACTER));// IBO
 
     glfwSwapBuffers(window);
