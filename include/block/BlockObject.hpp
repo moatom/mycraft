@@ -20,11 +20,13 @@ class BlockObject {
     glm::vec3 Size;
   public:
     BlockObject(): Size(glm::vec3(2*UNIT)) {}
-    BlockObject(glm::vec3 *position): Position(position), Size(glm::vec3(2*UNIT)) {}
+    BlockObject(glm::vec3* position): Position(position), Size(glm::vec3(2*UNIT)) {}
 
     glm::vec3 getPosition() {return *Position;}
     glm::vec3 getSize() {return Size;}
-    void setPosition(glm::vec3 *position) {Position = position;}
+    void setPosition(glm::vec3* position) {Position = position;}
+    void setPositionValue(glm::vec3& position) {*Position = position;}
+    void addPositionValue(glm::vec3&& position) {*Position += position;}
 };
 
 #endif

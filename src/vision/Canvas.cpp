@@ -1,4 +1,5 @@
 #include <vision/Canvas.hpp>
+#include <utility>
 
 void Canvas::setCallbackFunction(GLFWwindow* window)
 {
@@ -11,6 +12,7 @@ void Canvas::setCallbackFunction(GLFWwindow* window)
   });
 }
 
+// キャラクター周りの回転にしたい
 void Canvas::mouseCallbackFunction(GLFWwindow* window, double x, double y)
 {
   if (firstCall) {
@@ -68,14 +70,17 @@ void Canvas::update(KeyManager km, BlockManager& bm, int mode)
   }
   Velocity.z = velo.z;
 
-// setPosition
-  BlockPosition += 2.5f * DeltaTime * Velocity;
-  Position  = BlockBaseCanvasPosition + BlockPosition;
+  // BlockPosition += 2.5f * DeltaTime * Velocity;
+  Block.addPositionValue(2.5f * DeltaTime * Velocity);
+  // Block.addPositionValue(0.05f * DeltaTime * Velocity);
+  Position  = BlockBaseCanvasPosition + Block.getPosition();
 
   auto modify = bm.collideWith(Block);
-  if (std::get<0>(modify)) {
-    Position += std::get<1>(modify);
+  if (std::get<0>(modify)) {// 定期的に下に抜けるな。
+    // v3Print("Position", std::get<1>(modify));
+    // v3Print("Velocity", std::get<2>(modify));
+    Block.addPositionValue(std::move(std::get<1>(modify)));
+    Position = BlockBaseCanvasPosition + Block.getPosition();
     Velocity *= std::get<2>(modify);
   }
-
 }

@@ -35,7 +35,13 @@ int main()
   }
   sm.attachObjects(vao, bm.getBlockOffsetsRef(GRASS));// IBO
 
-  Canvas canvas(windowWidth / windowHeight);
+
+  BlockRef br2 = bm.getBlockRef(CHARACTER);
+  GLuint vao2 = sm.makeBOID(br2.model.getCube(), br2.model.getCubeIndex(), br2.material.getImage());// VBO, EBO, TEX
+  bm.addBlock(CHARACTER, BlockObject(), glm::vec3(6*UNIT, 2*UNIT, 6*UNIT));// IBO
+  sm.attachObjects(vao2, bm.getBlockOffsetsRef(CHARACTER));// IBO
+
+  Canvas canvas(windowWidth / windowHeight, bm.getCharacter());
   canvas.setCallbackFunction(window);
   canvas.setModel(glm::scale(glm::mat4(1.0f), glm::vec3(UNIT)));
   canvas.setView();
@@ -45,17 +51,18 @@ int main()
   sm.setUniformM4f("proj",  canvas.getProjPtr());
 
   while (!glfwWindowShouldClose(window)) {
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    sm.render(vao);
+    sm.render(vao2);
+
     canvas.setTime(glfwGetTime());
     controller.keyInputsPoll(window);
-
     canvas.setView();
     canvas.setProj();
     sm.setUniformM4f("view",  canvas.getViewPtr());
     sm.setUniformM4f("proj",  canvas.getProjPtr());
-
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    sm.render(vao);
-    canvas.update(controller.getKeyInputs(), bm, !DEBUG_MODE);
+    canvas.update(controller.getKeyInputs(), bm, DEBUG_MODE);
+    sm.attachObjects(vao2, bm.getBlockOffsetsRef(CHARACTER));// IBO
 
     glfwSwapBuffers(window);
     glfwPollEvents();

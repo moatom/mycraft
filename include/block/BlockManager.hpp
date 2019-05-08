@@ -14,7 +14,7 @@
 #include "../util.hpp"
 
 enum BlockType {
-  // CANVAS,
+  CHARACTER,
   GRASS, ROCK, BRICK,
   BLOCK_TYPE_SIZE
 };
@@ -22,9 +22,9 @@ enum BlockType {
 struct cmpVec3ByElements {
   bool operator()(const glm::vec3& lhs, const glm::vec3& rhs) const
   {
-    // 排他的じゃないが。。。
-    return  lhs.x < rhs.x ||
-            (glm::abs<float>(lhs.x - rhs.x) < glm::epsilon<float>() && (lhs.y < rhs.y || (glm::abs<float>(lhs.y - rhs.y) < glm::epsilon<float>()  && lhs.z < rhs.z)));
+    return  (glm::abs<float>(lhs.x - rhs.x) >= glm::epsilon<float>() && lhs.x < rhs.x) ||
+            (glm::abs<float>(lhs.x - rhs.x) <  glm::epsilon<float>() && ((glm::abs<float>(lhs.y - rhs.y) >= glm::epsilon<float>() && lhs.y < rhs.y) ||
+            (glm::abs<float>(lhs.y - rhs.y) <  glm::epsilon<float>() &&  (glm::abs<float>(lhs.z - rhs.z) >= glm::epsilon<float>() && lhs.z < rhs.z))));
   }
 };
 
@@ -49,14 +49,8 @@ class BlockManager {
     void addBlock(BlockType, BlockObject, glm::vec3);
     std::tuple<bool, glm::vec3, glm::vec3> collideWith(BlockObject&);
 
-    BlockRef getBlockRef(BlockType type)
-    {
-      return BlockRef{model, BlockSets[type].material};
-    }
-
-    std::vector<glm::vec3>& getBlockOffsetsRef(BlockType type)
-    {
-      return BlockSets[type].OffsetList;
-    }
+    BlockRef getBlockRef(BlockType type) {return BlockRef{model, BlockSets[type].material};}
+    std::vector<glm::vec3>& getBlockOffsetsRef(BlockType type) {return BlockSets[type].OffsetList;}
+    BlockObject& getCharacter() {return BlockSets[CHARACTER].BlockList.begin()->second;}
 };
 #endif
