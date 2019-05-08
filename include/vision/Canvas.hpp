@@ -29,6 +29,7 @@ class Canvas {
     glm::vec3 Velocity = glm::vec3(0.0f, 0.0f,  0.0f);
     const float Acc = -1.0f;
     const float MaxSpeed = 0.5f;
+    // const float MaxSpeed = 3.0f;
     
     glm::mat4 Model;
     glm::mat4 View;

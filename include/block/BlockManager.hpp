@@ -13,12 +13,6 @@
 #include "Material.hpp"
 #include "../util.hpp"
 
-enum BlockType {
-  GRASS, ROCK, BRICK,
-  CHARACTER,
-  BLOCK_TYPE_SIZE
-};
-
 struct cmpVec3ByElements {
   bool operator()(const glm::vec3& lhs, const glm::vec3& rhs) const
   {
@@ -28,13 +22,15 @@ struct cmpVec3ByElements {
   }
 };
 
-typedef struct {
+struct BlockSet {
   std::map<glm::vec3, BlockObject, cmpVec3ByElements> BlockList;
   std::vector<glm::vec3> OffsetList;
-  Material material;
+  Material material;// ここでブロックタイプを渡す
   bool needUpdate;
   int lastModified;
-} BlockSet;
+
+  BlockSet(BlockType type): material(type) {}
+};
 
 typedef struct {
   Model &model;
@@ -43,7 +39,7 @@ typedef struct {
 
 class BlockManager {
   Model model;
-  BlockSet BlockSets[BLOCK_TYPE_SIZE];
+  BlockSet BlockSets[BLOCK_TYPE_SIZE]{GRASS, ROCK, BRICK, CHARACTER};
 
   public:
     void addBlock(BlockType, BlockObject, glm::vec3);

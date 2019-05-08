@@ -7,13 +7,29 @@
 #include "BlockStruct.hpp"
 #include "../SOIL.h"
 
+enum BlockType {
+  GRASS, ROCK, BRICK,
+  CHARACTER,
+  BLOCK_TYPE_SIZE
+};
+
 class Material {
   Image image;
 
   public:// spを取り除けばシェーダとの依存性がなくなって、BMとの繋がりが大きくなる。material
-    Material()
+    Material(BlockType type)
     {
-      image.body = SOIL_load_image("../resources/tex.png", &image.width, &image.height, 0, SOIL_LOAD_RGB);
+      switch (type) {
+        case GRASS: 
+          image.body = SOIL_load_image("../resources/tex.png", &image.width, &image.height, 0, SOIL_LOAD_RGB);
+          break;
+        case CHARACTER:
+          image.body = SOIL_load_image("../resources/bar.png", &image.width, &image.height, 0, SOIL_LOAD_RGB);
+          break;
+        default:
+          std::cerr << "Nothing texture" << std::endl;
+          break;
+      }
       if (image.body == NULL) {
         std::cerr << "image fault" << std::endl;
         std::cerr << SOIL_last_result() << std::endl;
