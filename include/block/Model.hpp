@@ -1,5 +1,5 @@
-#ifndef __MODEL_HPP__
-#define __MODEL_HPP__
+#ifndef INCLUDED_MODEL_HPP
+#define INCLUDED_MODEL_HPP
 
 #include <GL/glew.h>
 #include <array>

@@ -1,5 +1,5 @@
-#ifndef __MATERIAL_HPP__
-#define __MATERIAL_HPP__
+#ifndef INCLUDED_MATERIAL_HPP
+#define INCLUDED_MATERIAL_HPP
 
 #include <iostream>
 #include <GL/glew.h>

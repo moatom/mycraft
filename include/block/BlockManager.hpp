@@ -1,5 +1,5 @@
-#ifndef __BLOCK_MANAGER_HPP__
-#define __BLOCK_MANAGER_HPP__
+#ifndef INCLUDED_BLOCK_MANAGER_HPP
+#define INCLUDED_BLOCK_MANAGER_HPP
 
 #include <vector>
 #include <array>

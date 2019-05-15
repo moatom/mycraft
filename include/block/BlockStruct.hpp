@@ -1,5 +1,5 @@
-#ifndef __BLOCK_STRUCT_HPP__
-#define __BLOCK_STRUCT_HPP__
+#ifndef INCLUDED_BLOCK_STRUCT_HPP
+#define INCLUDED_BLOCK_STRUCT_HPP
 
 #include <glm/glm.hpp>
 

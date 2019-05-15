@@ -1,5 +1,5 @@
-#ifndef __GAME_CONTROLLER_HPP__
-#define __GAME_CONTROLLER_HPP__
+#ifndef INCLUDED_GAME_CONTROLLER_HPP
+#define INCLUDED_GAME_CONTROLLER_HPP
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>

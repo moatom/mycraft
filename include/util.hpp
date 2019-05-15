@@ -1,5 +1,5 @@
-#ifndef __UTIL_HPP__
-#define __UTIL_HPP__
+#ifndef INCLUDED_UTIL_HPP
+#define INCLUDED_UTIL_HPP
 
 #include <iostream>
 #include <glm/glm.hpp>

@@ -1,5 +1,5 @@
-#ifndef __SHADER_MANAGER_HPP__
-#define __SHADER_MANAGER_HPP__
+#ifndef INCLUDED_SHADER_MANAGER_HPP
+#define INCLUDED_SHADER_MANAGER_HPP
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>

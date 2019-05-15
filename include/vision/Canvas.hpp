@@ -1,5 +1,5 @@
-#ifndef __CANVAS_HPP__
-#define __CANVAS_HPP__
+#ifndef INCLUDED_CANVAS_HPP
+#define INCLUDED_CANVAS_HPP
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>

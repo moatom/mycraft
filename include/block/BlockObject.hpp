@@ -1,5 +1,5 @@
-#ifndef __BLOCK_OBJECT_HPP__
-#define __BLOCK_OBJECT_HPP__
+#ifndef INCLUDED_BLOCK_OBJECT_HPP
+#define INCLUDED_BLOCK_OBJECT_HPP
 
 #include <glm/glm.hpp>
 #define UNIT 0.2f// ややこしいので、2倍に直す？名前を帰るか
