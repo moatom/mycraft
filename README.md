@@ -5,7 +5,7 @@ Supported OS: MacOS
 My development blog: https://moatom.blogspot.com/2019/05/opengl03.html
 
 To do
-- fix include guards
+- fix the include guards
 - Find the bug's details when drawnig trees in a certain position
 
 Block texture
