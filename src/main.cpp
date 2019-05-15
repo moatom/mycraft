@@ -13,6 +13,25 @@ const int windowWidth = 1200;// 800"600
 const int windowHeight = 900;
 GLFWwindow* init();
 
+glm::vec3 treeLeaf[] = {
+  {-1.f, 3.f, 0.f}, {0.f, 3.f, 0.f}, {1.f, 3.f, 0.f}, {0.f, 3.f, 1.f}, {0.f, 3.f, -1.f},
+  {-1.f, 2.f, 0.f},                  {1.f, 2.f, 0.f}, {0.f, 2.f, 1.f}, {0.f, 2.f, -1.f},
+  {-2.f, 1.f, 0.f}, {-1.f, 1.f, 0.f},                  {1.f, 1.f, 0.f}, {2.f, 1.f, 0.f},\
+  {-2.f, 1.f, 1.f}, {-1.f, 1.f, 1.f}, {0.f, 1.f, 1.f}, {1.f, 1.f, 1.f}, {2.f, 1.f, 1.f},\
+                    {-1.f, 1.f, 2.f}, {0.f, 1.f, 2.f}, {1.f, 1.f, 2.f},\
+  {-2.f, 1.f, -1.f},{-1.f, 1.f, -1.f},{0.f, 1.f, -1.f},{1.f, 1.f, -1.f},{2.f, 1.f, -1.f},\
+                    {-1.f, 1.f, -2.f},{0.f, 1.f, -2.f},{1.f, 1.f, -2.f},
+  {-2.f, 0.f, 0.f}, {-1.f, 0.f, 0.f},                  {1.f, 0.f, 0.f}, {2.f, 0.f, 0.f},\
+  {-2.f, 0.f, 1.f}, {-1.f, 0.f, 1.f}, {0.f, 0.f, 1.f}, {1.f, 0.f, 1.f}, {2.f, 0.f, 1.f},\
+                    {-1.f, 0.f, 2.f}, {0.f, 0.f, 2.f}, {1.f, 0.f, 2.f},\
+  {-2.f, 0.f, -1.f},{-1.f, 0.f, -1.f},{0.f, 0.f, -1.f},{1.f, 0.f, -1.f},{2.f, 0.f, -1.f},\
+                    {-1.f, 0.f, -2.f},{0.f, 0.f, -2.f},{1.f, 0.f, -2.f},
+};
+
+glm::vec3 treeStem[] = {
+  {0.f, 2.f, 0.f}, {0.f, 1.f, 0.f}, {0.f, 0.f, 0.f}, {0.f, -1.f, 0.f}, {0.f, -2.f, 0.f}
+};
+
 int main()
 {
   GLFWwindow* window = init();
@@ -23,6 +42,7 @@ int main()
   BlockRef br = bm.getBlockRef(GRASS);
   GLuint vao = sm.makeBOID(br.model.getCube(), br.model.getCubeIndex(), br.material.getImage());// VBO, EBO, TEX
   
+  // append terrain
   for (int i=0; i<20; ++i) {
     for (int j=0; j<20; ++j) {
       bm.addBlock(GRASS, BlockObject(), glm::vec3(2*j*UNIT, 2*i*UNIT + 2*UNIT, 0.0f));// IBO
@@ -42,6 +62,21 @@ int main()
   bm.addBlock(CHARACTER, BlockObject(), glm::vec3(8*UNIT, 6*UNIT, 8*UNIT));
   sm.attachObjects(vao2, bm.getBlockOffsetsRef(CHARACTER));// IBO
 
+  // append tree
+  glm::vec3 treeBasePos = 2*UNIT*glm::vec3{10.f, 5.f, 30.f};
+  BlockRef tlRef = bm.getBlockRef(TREE_LEAF);
+  GLuint tlVao = sm.makeBOID(tlRef.model.getCube(), tlRef.model.getCubeIndex(), tlRef.material.getImage());
+  for (int i=0; i<sizeof(treeLeaf)/sizeof(treeLeaf[0]); ++i) {
+     bm.addBlock(TREE_LEAF, BlockObject(), 2*UNIT*treeLeaf[i] + treeBasePos);
+  }
+  sm.attachObjects(tlVao, bm.getBlockOffsetsRef(TREE_LEAF));
+  BlockRef tsRef = bm.getBlockRef(TREE_STEM);
+  GLuint tsVao = sm.makeBOID(tsRef.model.getCube(), tsRef.model.getCubeIndex(), tsRef.material.getImage());
+  for (int i=0; i<sizeof(treeStem)/sizeof(treeStem[0]); ++i) {
+     bm.addBlock(TREE_STEM, BlockObject(), 2*UNIT*treeStem[i] + treeBasePos);
+  }
+  sm.attachObjects(tsVao, bm.getBlockOffsetsRef(TREE_STEM));
+
   Canvas canvas(bm.getCharacter(), windowWidth / windowHeight);
   canvas.setCallbackFunction(window);
   canvas.setModel(glm::scale(glm::mat4(1.0f), glm::vec3(UNIT)));
@@ -53,8 +88,11 @@ int main()
 
   while (!glfwWindowShouldClose(window)) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    // 特定種のブロックを表示上消せるのは便利だけど、コードがわかりにくい
     sm.render(vao);
     sm.render(vao2);
+    sm.render(tlVao);
+    sm.render(tsVao);
 
     canvas.setTime(glfwGetTime());
     controller.keyInputsPoll(window);
@@ -63,7 +101,7 @@ int main()
     sm.setUniformM4f("view",  canvas.getViewPtr());
     sm.setUniformM4f("proj",  canvas.getProjPtr());
     canvas.update(controller.getKeyInputs(), bm, !DEBUG_MODE);
-    sm.attachObjects(vao2, bm.getBlockOffsetsRef(CHARACTER));// IBO
+    sm.attachObjects(vao2, bm.getBlockOffsetsRef(CHARACTER));// 更新
 
     glfwSwapBuffers(window);
     glfwPollEvents();

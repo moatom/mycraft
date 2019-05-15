@@ -6,6 +6,9 @@ Most recent situation: https://moatom.blogspot.com/2019/05/opengl03.html
 
 To do
 - fix include guards
-- draw trees
+- Fix the bug in drawnig trees
+
+Block texture
+- 2048 x 512
 
 ![スクリーンショット 2019-05-06 10 36 50](https://user-images.githubusercontent.com/37573952/57203424-ec5c1980-6fea-11e9-9124-db181e450479.png)

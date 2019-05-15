@@ -77,11 +77,11 @@ void Canvas::update(KeyManager km, BlockManager& bm, int mode)
 
   auto modify = bm.collideWith(Block);
   if (std::get<0>(modify)) {
-    v3Print("offset", std::get<1>(modify));
-    v3Print("Velocity", std::get<2>(modify));
+    // v3Print("offset", std::get<1>(modify));
+    // v3Print("Velocity", std::get<2>(modify));
     Block.addPositionValue(std::move(std::get<1>(modify)));
     Position = BlockBaseCanvasPosition + Block.getPosition();
     Velocity *= std::get<2>(modify);
-    v3Print("position", Block.getPosition());
+    // v3Print("position", Block.getPosition());
   }
 }

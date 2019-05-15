@@ -54,8 +54,8 @@ std::tuple<bool, glm::vec3, glm::vec3> BlockManager::collideWith(BlockObject& bl
           bMax = t + UNIT;
           if (glm::all(glm::greaterThan(aMax, bMin)) && glm::all(glm::greaterThan(bMax, aMin))) {
             // 一回で9個とあたる　床内部の側面と当たっているのはまずいな　入り込んでからだから確かにありうる。
-            test("-----------");
-            v3Print("targetPos", t);
+            // test("-----------");
+            // v3Print("targetPos", t);
             float max(0.f);
             int index=0;
             glm::vec3 relativeV = t - block.getPosition();

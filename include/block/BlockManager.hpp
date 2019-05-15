@@ -39,7 +39,7 @@ typedef struct {
 
 class BlockManager {
   Model model;
-  BlockSet BlockSets[BLOCK_TYPE_SIZE]{GRASS, ROCK, BRICK, CHARACTER};
+  BlockSet BlockSets[BLOCK_TYPE_SIZE]{GRASS, ROCK, BRICK, TREE_LEAF, TREE_STEM, CHARACTER};
 
   public:
     void addBlock(BlockType, BlockObject, glm::vec3);
