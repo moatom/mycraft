@@ -52,7 +52,8 @@ void Canvas::update(KeyManager km, BlockManager& bm, int mode)
   glm::vec3 velo(0.0f);
   velo += static_cast<float>(static_cast<int>(km.d) - static_cast<int>(km.a)) * glm::cross(Front, Up);
   velo += static_cast<float>(static_cast<int>(km.z) - static_cast<int>(km.x)) * Up;
-  velo += static_cast<float>(static_cast<int>(km.w) - static_cast<int>(km.s)) * Front;
+  velo.x += (static_cast<float>(static_cast<int>(km.w) - static_cast<int>(km.s)) * Front).x;
+  velo.z += (static_cast<float>(static_cast<int>(km.w) - static_cast<int>(km.s)) * Front).z;
   if (!glm::all(glm::lessThan(glm::abs(velo), glm::vec3(glm::epsilon<float>())))) {
     velo = glm::normalize(velo);
   }
@@ -70,7 +71,6 @@ void Canvas::update(KeyManager km, BlockManager& bm, int mode)
   }
   Velocity.z = velo.z;
 
-  // BlockPosition += 2.5f * DeltaTime * Velocity;
   Block.addPositionValue(2.5f * DeltaTime * Velocity);
   // Block.addPositionValue(0.05f * DeltaTime * Velocity);
   Position  = BlockBaseCanvasPosition + Block.getPosition();
