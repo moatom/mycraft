@@ -13,7 +13,7 @@ const int windowWidth = 1200;// 800"600
 const int windowHeight = 900;
 GLFWwindow* init();
 
-glm::vec3 treeLeaf[] = {
+constexpr glm::vec3 treeLeaf[] = {
   {-1.f, 3.f, 0.f}, {0.f, 3.f, 0.f}, {1.f, 3.f, 0.f}, {0.f, 3.f, 1.f}, {0.f, 3.f, -1.f},
   {-1.f, 2.f, 0.f},                  {1.f, 2.f, 0.f}, {0.f, 2.f, 1.f}, {0.f, 2.f, -1.f},
   {-2.f, 1.f, 0.f}, {-1.f, 1.f, 0.f},                  {1.f, 1.f, 0.f}, {2.f, 1.f, 0.f},\
@@ -25,10 +25,10 @@ glm::vec3 treeLeaf[] = {
   {-2.f, 0.f, 1.f}, {-1.f, 0.f, 1.f}, {0.f, 0.f, 1.f}, {1.f, 0.f, 1.f}, {2.f, 0.f, 1.f},\
                     {-1.f, 0.f, 2.f}, {0.f, 0.f, 2.f}, {1.f, 0.f, 2.f},\
   {-2.f, 0.f, -1.f},{-1.f, 0.f, -1.f},{0.f, 0.f, -1.f},{1.f, 0.f, -1.f},{2.f, 0.f, -1.f},\
-                    {-1.f, 0.f, -2.f},{0.f, 0.f, -2.f},{1.f, 0.f, -2.f},
+                    {-1.f, 0.f, -2.f},{0.f, 0.f, -2.f},{1.f, 0.f, -2.f}
 };
 
-glm::vec3 treeStem[] = {
+constexpr glm::vec3 treeStem[] = {
   {0.f, 2.f, 0.f}, {0.f, 1.f, 0.f}, {0.f, 0.f, 0.f}, {0.f, -1.f, 0.f}, {0.f, -2.f, 0.f}
 };
 
@@ -42,28 +42,27 @@ int main()
   BlockRef br = bm.getBlockRef(GRASS);
   GLuint vao = sm.makeBOID(br.model.getCube(), br.model.getCubeIndex(), br.material.getImage());// VBO, EBO, TEX
   
-  // append terrain
-  for (int i=0; i<20; ++i) {
-    for (int j=0; j<20; ++j) {
-      bm.addBlock(GRASS, BlockObject(), glm::vec3(2*j*UNIT, 2*i*UNIT + 2*UNIT, 0.0f));// IBO
-    }
-  }
+  BlockRef br2 = bm.getBlockRef(CHARACTER);
+  GLuint vao2 = sm.makeBOID(br2.model.getCube(), br2.model.getCubeIndex(), br2.material.getImage());// VBO, EBO, TEX
+  // bm.addBlock(CHARACTER, BlockObject(), glm::vec3(8*UNIT, 2*UNIT, 8*UNIT));
+  bm.addBlock(CHARACTER, BlockObject(), glm::vec3(8*UNIT, 6*UNIT, 16*UNIT));
+  sm.attachObjects(vao2, bm.getBlockOffsetsRef(CHARACTER));// IBO
+  
+  // append terrain and wall
   for (int i=0; i<20; ++i) {
     for (int j=0; j<20; ++j) {
       bm.addBlock(GRASS, BlockObject(), glm::vec3(2*j*UNIT, 0.0f, 2*i*UNIT));// IBO
     }
   }
+  for (int i=0; i<20; ++i) {
+    for (int j=0; j<20; ++j) {
+      bm.addBlock(GRASS, BlockObject(), glm::vec3(2*j*UNIT, 2*i*UNIT + 2*UNIT, 0.0f));// IBO
+    }
+  }
   sm.attachObjects(vao, bm.getBlockOffsetsRef(GRASS));// IBO
 
-
-  BlockRef br2 = bm.getBlockRef(CHARACTER);
-  GLuint vao2 = sm.makeBOID(br2.model.getCube(), br2.model.getCubeIndex(), br2.material.getImage());// VBO, EBO, TEX
-  // bm.addBlock(CHARACTER, BlockObject(), glm::vec3(8*UNIT, 2*UNIT, 8*UNIT));
-  bm.addBlock(CHARACTER, BlockObject(), glm::vec3(8*UNIT, 6*UNIT, 8*UNIT));
-  sm.attachObjects(vao2, bm.getBlockOffsetsRef(CHARACTER));// IBO
-
   // append tree
-  glm::vec3 treeBasePos = 2*UNIT*glm::vec3{10.f, 5.f, 30.f};
+  glm::vec3 treeBasePos = 2*UNIT*glm::vec3{5.f, 2.f+1.f, 5.f};
   BlockRef tlRef = bm.getBlockRef(TREE_LEAF);
   GLuint tlVao = sm.makeBOID(tlRef.model.getCube(), tlRef.model.getCubeIndex(), tlRef.material.getImage());
   for (int i=0; i<sizeof(treeLeaf)/sizeof(treeLeaf[0]); ++i) {

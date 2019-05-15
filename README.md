@@ -1,14 +1,14 @@
-Use cmake & make under the build directory in order to load block textures.
+Use cmake & make under a build directory which in the project root in order to load block textures.
 
 Supported OS: MacOS
 
-Most recent situation: https://moatom.blogspot.com/2019/05/opengl03.html
+My development blog: https://moatom.blogspot.com/2019/05/opengl03.html
 
 To do
 - fix include guards
-- Fix the bug in drawnig trees
+- Find the bug's details when drawnig trees in a certain position
 
 Block texture
 - 2048 x 512
 
-![スクリーンショット 2019-05-06 10 36 50](https://user-images.githubusercontent.com/37573952/57203424-ec5c1980-6fea-11e9-9124-db181e450479.png)
+![image](https://user-images.githubusercontent.com/37573952/57754609-cdb3fc00-7729-11e9-8e23-8bdd51c195b7.png)
