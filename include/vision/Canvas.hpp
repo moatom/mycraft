@@ -20,8 +20,6 @@ class Canvas {
 
     // const glm::vec3 BlockBaseCanvasPosition = glm::vec3(0.f, 5*UNIT, 4*UNIT);
     const glm::vec3 BlockBaseCanvasPosition = glm::vec3(0.f, 3*UNIT, 10*UNIT);
-    // const glm::vec3 BlockBaseCanvasPosition = glm::vec3(0.f, 0.f, 1.f);
-    // const glm::vec3 BlockBaseCanvasPosition = glm::vec3(1.f, 0.f, 0.f);
     glm::vec3 Position = BlockBaseCanvasPosition + Block.getPosition();
     glm::vec3 Front    = glm::vec3(0.0f, 0.0f, -1.0f);
     glm::vec3 Up       = glm::vec3(0.0f, 1.0f,  0.0f);

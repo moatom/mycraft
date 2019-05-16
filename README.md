@@ -1,6 +1,8 @@
-Use cmake & make under a build directory which in the project root in order to load the block textures.
-
 Supported OS: MacOS
+
+Use cmake under a build directory which in the project root in order to load the block textures.
+
+e.g. `cmake --build . -- -jN` N is the number of your CPU's cores.
 
 My development blog: https://moatom.blogspot.com/2019/05/opengl03.html
 

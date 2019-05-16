@@ -4,10 +4,9 @@
 #include <block/BlockManager.hpp>
 #include <vision/Canvas.hpp>
 #include <vision/GameController.hpp>
-// #include <util.hpp>
 #define DEBUG_MODE 1
 
-const int windowWidth = 1200;// 800"600
+const int windowWidth = 1200;
 const int windowHeight = 900;
 GLFWwindow* init();
 
@@ -35,14 +34,14 @@ int main()
   GLFWwindow* window = init();
   GameController controller;
 
-  ShaderManager sm;
+  ShaderManager sm;// シングルトンで管理するかなー
   BlockManager bm;
+  
   BlockRef br = bm.getBlockRef(GRASS);
   GLuint vao = sm.makeBOID(br.model.getCube(), br.model.getCubeIndex(), br.material.getImage());// VBO, EBO, TEX
   
   BlockRef br2 = bm.getBlockRef(CHARACTER);
   GLuint vao2 = sm.makeBOID(br2.model.getCube(), br2.model.getCubeIndex(), br2.material.getImage());// VBO, EBO, TEX
-  // bm.addBlock(CHARACTER, BlockObject(), glm::vec3(8*UNIT, 2*UNIT, 8*UNIT));
   bm.addBlock(CHARACTER, BlockObject(), glm::vec3(8*UNIT, 6*UNIT, 16*UNIT));
   sm.attachObjects(vao2, bm.getBlockOffsetsRef(CHARACTER));// IBO
   
@@ -60,18 +59,29 @@ int main()
   sm.attachObjects(vao, bm.getBlockOffsetsRef(GRASS));// IBO
 
   // append tree
-  glm::vec3 treeBasePos = 2*UNIT*glm::vec3{5.f, 2.f+1.f, 5.f};
   BlockRef tlRef = bm.getBlockRef(TREE_LEAF);
+  BlockRef tsRef = bm.getBlockRef(TREE_STEM);
   GLuint tlVao = sm.makeBOID(tlRef.model.getCube(), tlRef.model.getCubeIndex(), tlRef.material.getImage());
-  for (int i=0; i<sizeof(treeLeaf)/sizeof(treeLeaf[0]); ++i) {
-     bm.addBlock(TREE_LEAF, BlockObject(), 2*UNIT*treeLeaf[i] + treeBasePos);
+  GLuint tsVao = sm.makeBOID(tsRef.model.getCube(), tsRef.model.getCubeIndex(), tsRef.material.getImage());
+  {
+    glm::vec3 treeBasePos = 2*UNIT*glm::vec3{2.f, 2.f+1.f, 5.f};
+    for (int i=0; i<sizeof(treeLeaf)/sizeof(treeLeaf[0]); ++i) {
+      bm.addBlock(TREE_LEAF, BlockObject(), 2*UNIT*treeLeaf[i] + treeBasePos);
+    }
+    for (int i=0; i<sizeof(treeStem)/sizeof(treeStem[0]); ++i) {
+      bm.addBlock(TREE_STEM, BlockObject(), 2*UNIT*treeStem[i] + treeBasePos);
+    }
+  }
+  {
+    glm::vec3 treeBasePos = 2*UNIT*glm::vec3{10.f, 2.f+1.f, 5.f};
+    for (int i=0; i<sizeof(treeLeaf)/sizeof(treeLeaf[0]); ++i) {
+      bm.addBlock(TREE_LEAF, BlockObject(), 2*UNIT*treeLeaf[i] + treeBasePos);
+    }
+    for (int i=0; i<sizeof(treeStem)/sizeof(treeStem[0]); ++i) {
+      bm.addBlock(TREE_STEM, BlockObject(), 2*UNIT*treeStem[i] + treeBasePos);
+    }
   }
   sm.attachObjects(tlVao, bm.getBlockOffsetsRef(TREE_LEAF));
-  BlockRef tsRef = bm.getBlockRef(TREE_STEM);
-  GLuint tsVao = sm.makeBOID(tsRef.model.getCube(), tsRef.model.getCubeIndex(), tsRef.material.getImage());
-  for (int i=0; i<sizeof(treeStem)/sizeof(treeStem[0]); ++i) {
-     bm.addBlock(TREE_STEM, BlockObject(), 2*UNIT*treeStem[i] + treeBasePos);
-  }
   sm.attachObjects(tsVao, bm.getBlockOffsetsRef(TREE_STEM));
 
   Canvas canvas(bm.getCharacter(), windowWidth / windowHeight);
