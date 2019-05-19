@@ -8,6 +8,7 @@ My development blog: https://moatom.blogspot.com/2019/05/opengl03.html
 
 To do
 - Find the details of the bug when drawnig trees in a certain position
+- Introduce factory method pattern
 
 Block textures' requirements
 - 2048 x 512
